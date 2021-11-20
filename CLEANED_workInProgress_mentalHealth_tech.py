@@ -58,7 +58,9 @@ speakUp['no_employees'].value_counts().sort_index()
 speakUp['Age'].value_counts().sort_index()
 speakUp['ageRange'].value_counts()
 speakUp['supervisorCode'].value_counts()
-
+"""
+sample sizes are unbalanced 
+"""
 # =============================================================================
 # Since the variables of choice are categorical or object dtypes, we can perform 
 # A) logistic regression through binary or multiclass 
@@ -96,11 +98,7 @@ ax.set_title("Probability plot of regression residuals \n with R value")
 ax.set
 plt.show()
 
-speakUp.describe()
-speakUp.skew()
-
-
-# Series of box plots and bar plots to visualze the distribution; ageRange was chosen over age for simplicity 
+# Series of box plots and bar plots to visualze the distribution; ageRange was chosen over age for simplicity and less graphical confusion
 import seaborn as sns 
 
 genderCode = sns.boxplot(x='Gender', y='supervisorCode', data= speakUp, palette='Set3')
@@ -180,6 +178,29 @@ Residual   605.0  423.693478  0.700320       NaN       NaN
 
 Gender is significantly different compared to supervisorCode because <0.05
 """
+
+model3 = ols('supervisorCode ~ C(ageRange)', data=speakUp).fit()
+anovaTable3 = sm.stats.anova_lm(model3, typ=1)
+anovaTable3
+"""
+                df      sum_sq   mean_sq         F    PR(>F)
+C(ageRange)    5.0    6.280377  1.256075  1.782672  0.114363
+Residual     602.0  424.170908  0.704603       NaN       NaN
+
+Age range is not significantly different compared to supervisorCode because >0.05
+"""
+
+model4 = ols('supervisorCode ~ C(no_employees)', data=speakUp).fit()
+anovaTable4 = sm.stats.anova_lm(model4, typ=1)
+anovaTable4
+"""
+                    df      sum_sq   mean_sq         F    PR(>F)
+C(no_employees)    5.0    5.843782  1.168756  1.654242  0.143734
+Residual         602.0  425.325626  0.706521       NaN       NaN
+
+Number of employees is not significantly different compared to supervisorCode because >0.05
+"""
+
 # Alternative to using statsmodel that will yield the same results 
 from bioinfokit.analys import stat
 # =============================================================================
